@@ -17,6 +17,7 @@ IF  EXISTS (
 DROP DATABASE [KB301_Bolshakov]
 GO
 
+
 CREATE DATABASE [KB301_Bolshakov]
 GO
 
@@ -26,30 +27,14 @@ GO
 CREATE SCHEMA Task3
 GO
 
-CREATE TABLE Task3.Post(
-	PostId tinyint NOT NULL
-	PRIMARY KEY (PostId)
-)
-GO
-
-
-CREATE TABLE Task3.CarType(
-	CarType nvarchar(20) NOT NULL
-	PRIMARY KEY (CarType) 
-)
-GO
-
 
 CREATE TABLE Task3.CarNumber(
-	C nvarchar(1) NOT NULL,
-	NNN nvarchar(3) NOT NULL,
-	CC nvarchar(2) NOT NULL,
+	CNNNCC nvarchar(6) NOT NULL,
 	Region nvarchar(3) NOT NULL,
-	CHECK (C LIKE '[юбейлмнпярсу]' and
-		   NNN LIKE '[0-9][0-9][0-9]' and
-		   NNN NOT LIKE '000' and
-		   CC LIKE '[юбейлмнпярсу][юбейлмнпярсу]' and 
-		   (Region LIKE '[0-9][1-9]' or Region LIKE '[127][0-9][0-9]'))
+	CHECK (CNNNCC LIKE '_[0-9][0-9][0-9]__' and 
+		   CNNNCC NOT LIKE '_000__' and
+		   CNNNCC LIKE '[юбейлмнпярсу]___[юбейлмнпярсу][юбейлмнпярсу]' and 
+		   (Region LIKE '[0-9][1-9]' or Region LIKE '[1][0-9][0-9]' or Region LIKE '[2][0-9][0-9]' or Region LIKE '[7][0-9][0-9]'))
 )
 GO
 
@@ -75,21 +60,9 @@ GO
 
 
 CREATE TABLE Task3.PolicePost(
-	CarNumber nvarchar(9) NOT NULL,
-	CarTime time  NOT NULL,
+	CarNumber nvarchar(6) NOT NULL,
+	CarRegion nvarchar(3) NOT NULL,
+	CarTime time(0)  NOT NULL,
 	CarInOut nvarchar(3) NOT NULL,
-	CarType nvarchar(20) NOT NULL,
 	PostId tinyint NOT NULL,
 )
-
-ALTER TABLE Task3.PolicePost ADD
-	CONSTRAINT FK_Post FOREIGN KEY (PostId)
-	REFERENCES Task3.Post(PostId)
-	ON UPDATE CASCADE 
-GO
-
-ALTER TABLE Task3.PolicePost ADD
-	CONSTRAINT FK_CarType FOREIGN KEY (CarType)
-	REFERENCES Task3.CarType(CarType)
-	ON UPDATE CASCADE 
-GO

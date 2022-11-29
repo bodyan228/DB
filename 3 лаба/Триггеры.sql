@@ -16,50 +16,67 @@ AS
   ELSE
     BEGIN
       INSERT INTO Task3.CarNumber
-        (C, NNN, CC, Region)
-        SELECT * FROM inserted
+        (CNNNCC, Region)
+        SELECT UPPER(CNNNCC), Region FROM inserted
     END
 GO
+
 
 CREATE TRIGGER PolicePostInsert
 ON Task3.PolicePost
 INSTEAD OF INSERT
 AS
-  DECLARE @NewEventTime time 
-  DECLARE @NewCarEvent varchar(3)
+  DECLARE @NewTime time 
+  DECLARE @NewEvent varchar(3)
 
-  SELECT @NewEventTime = EventTime FROM inserted
-  SELECT @NewCarEvent = CarEvent FROM inserted
+  SELECT @NewTime = CarTime FROM inserted
+  SELECT @NewEvent = CarInOut FROM inserted
 
-  IF NOT EXISTS  (
-    SELECT EventTime
-    FROM W3.PolicePost
-    WHERE CarId = (SELECT CarId FROM inserted)
+  IF EXISTS  (
+    SELECT CarInOut
+    FROM Task3.PolicePost
+    WHERE CarNumber = (SELECT UPPER(CarNumber) FROM inserted)
   )
   BEGIN
-    DECLARE @OldEventTime time
-    DECLARE @OldCarEvent varchar(3)
+    DECLARE @OldTime time
+    DECLARE @OldEvent varchar(3)
 
-    select top 1 @OldEventTime =
-      EventTime
-      from W3.PolicePost
-      where CarId = (select CarId from inserted)
-      order by EventTime desc
-    select top 1 @OldCarEvent =
-      CarEvent
-      from W3.PolicePost
-      where CarId = (select CarId from inserted)
-      order by EventTime desc
+    SELECT TOP 1 @OldTime = CarTime
+    FROM Task3.PolicePost
+    WHERE CarNumber = (SELECT UPPER(CarNumber) FROM inserted)
+    ORDER BY CarTime DESC
 
-    if (datediff(mi, @OldEventTime, @NewEventTime) < 5) or (@OldCarEvent like @NewCarEvent)
-      begin
-        raiserror('Невозможно.. Время меньше пяти минут', 1, 0)
-      end
-    else
-      begin
-        insert into W3.PolicePost
-          (PostId, CarId, CarEvent, EventTime)
-          select PostId, CarId, CarEvent, EventTime from inserted
-      end
-  end
-go 
+    SELECT TOP 1 @OldEvent = CarInOut
+    FROM Task3.PolicePost
+    WHERE CarNumber = (SELECT UPPER(CarNumber) FROM inserted)
+    ORDER BY CarTime DESC
+
+    IF (DATEDIFF(mi, @OldTime, @NewTime) < 5) or (@OldEvent like @NewEvent)
+      BEGIN
+        RAISERROR('С момента послдней регистрации прошло менее 5 минут', 1, 0)
+      END
+    ELSE
+      BEGIN
+        INSERT INTO Task3.PolicePost
+          (PostId, CarNumber, CarRegion, CarInOut, CarTime)
+          SELECT PostId, UPPER(CarNumber),CarRegion, CarInOut, CarTime FROM inserted
+      END
+  END
+
+  ELSE
+    BEGIN
+      IF NOT EXISTS (
+        SELECT CNNNCC
+        FROM Task3.CarNumber
+        WHERE CNNNCC = (SELECT CarNumber FROM inserted) AND Region = (SELECT Region FROM inserted)
+      )
+		BEGIN
+          INSERT INTO Task3.CarNumber
+            (CNNNCC, Region)
+            SELECT CarNumber, CarRegion FROM inserted
+        END
+		INSERT INTO Task3.PolicePost
+        (PostId, CarNumber, CarRegion, CarInOut, CarTime)
+        SELECT PostId, UPPER(CarNumber), CarRegion, CarInOut, CarTime FROM inserted
+	END
+GO
