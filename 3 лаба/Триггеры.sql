@@ -43,8 +43,12 @@ AS
     WHERE CarNumber = (SELECT UPPER(CarNumber) FROM inserted)
     ORDER BY CarTime DESC
 
-    IF (DATEDIFF(mi, @OldTime, @NewTime) < 5) or (@OldEvent like @NewEvent)
+
+    IF (DATEDIFF(mi, @OldTime, @NewTime) < 5)
 		THROW 50001,'С момента послдней регистрации прошло менее 5 минут!', 1
+
+	IF (@OldEvent like @NewEvent)
+		THROW 50004,'Машина не может въехать или выехать 2 раза', 1
 
     ELSE
       BEGIN

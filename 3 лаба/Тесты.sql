@@ -1,8 +1,14 @@
 USE KB301_Bolshakov
+GO
 
---Проверка на соотвествие времени
+--Проверка на соответствие времени
 EXEC InsertCar 2, 'в556тм', '02', 'Out', '10:06:00'
 EXEC InsertCar 2, 'в556тм', '02', 'In', '10:02:00'
+
+--Проверка на статус автомобиля
+EXEC InsertCar 2, 'а777мс', '02', 'In', '10:02:00'
+EXEC InsertCar 2, 'а777мс', '02', 'In', '10:10:00'
+
 
 --Проверка на соответствие региону
 EXEC InsertCar 2, 'а557тм', '000', 'Out', '10:06:00'
@@ -50,7 +56,3 @@ SELECT * FROM Cars
 SELECT * FROM LocalCars
 SELECT * FROM TransitCars
 SELECT * FROM NonLocalCars
-
-
-SELECT * FROM Task3.PolicePost
---Тесты
