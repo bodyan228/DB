@@ -33,7 +33,7 @@ CREATE SCHEMA IDZ
 GO
 
 CREATE TABLE IDZ.Authors(
-	CodeAuthor int NOT NULL,
+	CodeAuthor int identity(1,1) NOT NULL,
 	NameAuthor varchar(50) NOT NULL,
 	Birthday date NOT NULL,
 	PRIMARY KEY(CodeAuthor)
@@ -41,7 +41,7 @@ CREATE TABLE IDZ.Authors(
 GO
 
 CREATE TABLE IDZ.PublishingHouse(
-	CodePublish int NOT NULL,
+	CodePublish int identity(1,1) NOT NULL,
 	Publish varchar(50) NOT NULL,
 	City varchar(20) NOT NULL,
 	PRIMARY KEY(CodePublish)
@@ -49,7 +49,7 @@ CREATE TABLE IDZ.PublishingHouse(
 GO
 
 CREATE TABLE IDZ.Deliveries(
-	CodeDelivery int NOT NULL,
+	CodeDelivery int identity(1,1) NOT NULL,
 	NameDelivery varchar(50) NOT NULL,
 	NameCompany varchar(50) NOT NULL,
 	Address varchar(100) NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE IDZ.Deliveries(
 GO
 
 CREATE TABLE IDZ.Books(
-	CodeBook int NOT NULL,
+	CodeBook int identity(1,1) NOT NULL,
 	TitleBook varchar(40) NOT NULL,
 	CodeAuthor int NOT NULL,
 	Pages int NOT NULL,
@@ -72,13 +72,13 @@ CREATE TABLE IDZ.Books(
 GO
 
 CREATE TABLE IDZ.Purchases(
-	CodeBook int NOT NULL,
+	CodePurchase int identity(1,1) NOT NULL,
 	DateOrder date NOT NULL,
-	CodeDelivery int NOT NULL,
-	TypePurchase bit NOT NULL,
+	TypePurchase tinyint NOT NULL,
 	Cost money NOT NULL,
 	Amount int NOT NULL,
-	CodePurchase int NOT NULL,
+	CodeDelivery int NOT NULL,
+	CodeBook int NOT NULL,
 	FOREIGN KEY(CodeBook) REFERENCES IDZ.Books(CodeBook),
 	FOREIGN KEY(CodeDelivery) REFERENCES IDZ.Deliveries(CodeDelivery)
 )
